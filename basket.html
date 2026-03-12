@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Basket AI Analysis</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<h1>Basketball Video Analysis</h1>
+<a href="index.html">← Retour</a>
+</header>
+
+<section class="upload">
+
+<h2>Upload Match Video</h2>
+
+<input type="file" id="videoUpload" accept="video/*">
+
+<video id="videoPlayer" controls></video>
+
+<button onclick="analyzeVideo()">Lancer l'analyse</button>
+
+</section>
+
+<section class="dashboard">
+
+<div class="stats">
+
+<h2>Statistiques</h2>
+
+<ul>
+<li>Tirs : <span id="shots">0</span></li>
+<li>Passes : <span id="passes">0</span></li>
+<li>Interceptions : <span id="steals">0</span></li>
+<li>Possession estimée : <span id="possession">0</span>%</li>
+</ul>
+
+</div>
+
+<div class="court">
+
+<h2>Heatmap tirs</h2>
+
+<canvas id="courtCanvas"></canvas>
+
+</div>
+
+</section>
+
+<section class="timeline">
+
+<h2>Timeline du match</h2>
+
+<div id="timeline"></div>
+
+</section>
+
+<script src="script.js"></script>
+
+</body>
+</html>
