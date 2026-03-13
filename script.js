@@ -20,26 +20,20 @@ async function analyzeVideo() {
     const formData = new FormData();
     formData.append("video", file);
 
-    try {
-        const response = await fetch("http://localhost:5000/analyze", {
-            method: "POST",
-            body: formData
-        });
+    const response = await fetch("http://localhost:5000/analyze", {
+        method: "POST",
+        body: formData
+    });
 
-        const data = await response.json();
+    const data = await response.json();
 
-        document.getElementById("shots").innerText = data.shots;
-        document.getElementById("passes").innerText = data.passes;
-        document.getElementById("steals").innerText = data.steals;
-        document.getElementById("possession").innerText = data.possession;
+    document.getElementById("shots").innerText = data.shots;
+    document.getElementById("passes").innerText = data.passes;
+    document.getElementById("steals").innerText = data.steals;
+    document.getElementById("possession").innerText = data.possession;
 
-        generateHeatmapFromPositions(data.shots_positions);
-        generateTimelineFromEvents(data.events);
-
-    } catch (error) {
-        console.error(error);
-        alert("Erreur pendant l'analyse.");
-    }
+    generateHeatmapFromPositions(data.shots_positions);
+    generateTimelineFromEvents(data.events);
 }
 
 function generateHeatmapFromPositions(positions) {
@@ -68,7 +62,7 @@ function generateTimelineFromEvents(events) {
 
     events.forEach(ev => {
         const div = document.createElement("div");
-        div.innerText = `${ev.time}s - ${ev.type} - Joueur ${ev.player}`;
+        div.innerText = `${ev.time.toFixed(1)}s - ${ev.type}`;
         timeline.appendChild(div);
     });
 }
