@@ -1,85 +1,74 @@
-const upload = document.getElementById("videoUpload")
-const video = document.getElementById("videoPlayer")
+const upload = document.getElementById("videoUpload");
+const video = document.getElementById("videoPlayer");
 
-if(upload){
-upload.addEventListener("change",function(){
-
-const file=this.files[0]
-
-if(file){
-video.src=URL.createObjectURL(file)
+if (upload) {
+    upload.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+            video.src = URL.createObjectURL(file);
+        }
+    });
 }
 
-})
+async function analyzeVideo() {
+    const file = upload.files[0];
+    if (!file) {
+        alert("Merci de sélectionner une vidéo.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("video", file);
+
+    try {
+        const response = await fetch("http://localhost:5000/analyze", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        document.getElementById("shots").innerText = data.shots;
+        document.getElementById("passes").innerText = data.passes;
+        document.getElementById("steals").innerText = data.steals;
+        document.getElementById("possession").innerText = data.possession;
+
+        generateHeatmapFromPositions(data.shots_positions);
+        generateTimelineFromEvents(data.events);
+
+    } catch (error) {
+        console.error(error);
+        alert("Erreur pendant l'analyse.");
+    }
 }
 
-function analyzeVideo(){
+function generateHeatmapFromPositions(positions) {
+    const canvas = document.getElementById("courtCanvas");
+    const ctx = canvas.getContext("2d");
 
-// stats simulées
+    canvas.width = 400;
+    canvas.height = 300;
 
-let shots=Math.floor(Math.random()*30)
-let passes=Math.floor(Math.random()*120)
-let steals=Math.floor(Math.random()*15)
-let possession=Math.floor(Math.random()*60)+40
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-document.getElementById("shots").innerText=shots
-document.getElementById("passes").innerText=passes
-document.getElementById("steals").innerText=steals
-document.getElementById("possession").innerText=possession
+    positions.forEach(pos => {
+        const x = pos.x * canvas.width;
+        const y = pos.y * canvas.height;
 
-generateHeatmap(shots)
-generateTimeline()
-
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,0,0,0.5)";
+        ctx.fill();
+    });
 }
 
-function generateHeatmap(shots){
+function generateTimelineFromEvents(events) {
+    const timeline = document.getElementById("timeline");
+    timeline.innerHTML = "";
 
-const canvas=document.getElementById("courtCanvas")
-const ctx=canvas.getContext("2d")
-
-canvas.width=400
-canvas.height=300
-
-for(let i=0;i<shots;i++){
-
-let x=Math.random()*400
-let y=Math.random()*300
-
-ctx.beginPath()
-ctx.arc(x,y,8,0,Math.PI*2)
-ctx.fillStyle="rgba(255,0,0,0.5)"
-ctx.fill()
-
-}
-
-}
-
-function generateTimeline(){
-
-const timeline=document.getElementById("timeline")
-
-timeline.innerHTML=""
-
-let events=[
-"Tir réussi",
-"Interception",
-"Passe décisive",
-"Contre",
-"Rebond offensif"
-]
-
-for(let i=0;i<8;i++){
-
-let minute=Math.floor(Math.random()*40)
-
-let event=events[Math.floor(Math.random()*events.length)]
-
-let div=document.createElement("div")
-
-div.innerText=minute+"' - "+event
-
-timeline.appendChild(div)
-
-}
-
+    events.forEach(ev => {
+        const div = document.createElement("div");
+        div.innerText = `${ev.time}s - ${ev.type} - Joueur ${ev.player}`;
+        timeline.appendChild(div);
+    });
 }
